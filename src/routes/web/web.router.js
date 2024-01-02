@@ -1,10 +1,12 @@
 import { Router } from "express";
-import { upload } from "../../middlewares/middlewares.js";
+import { upload } from "../../middlewares/saveImage.js";
 
 import { productModel } from "../../dao/models/product.model.js";
 import { cartModel } from "../../dao/models/cart.model.js";
 import { BASE_URL } from "../../config.js";
-import { isAuthenticated } from "../../middlewares/auth.js";
+import { isAuthenticated } from "../../middlewares/authorization.js";
+import { usersRouter } from "./users.router.js";
+import { sessionsRouter } from "./sessions.router.js";
 
 export const webRouter = Router();
 
@@ -17,14 +19,13 @@ webRouter.get("/", (req, res) => {
   }
 });
 
-webRouter.get("/products", isAuthenticated, (req, res) => {
+webRouter.get("/products", (req, res) => {
   try {
     return res.render("products.handlebars", {
       pageTitle: `Products`,
-      ...req.session["user"],
+      user: req.user,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Error loading /products" });
   }
 });
@@ -114,31 +115,5 @@ webRouter.get("/carts/:id", async (req, res) => {
 });
 
 // AUTH
-webRouter.use("/register", (req, res) => {
-  try {
-    return res.render("register.handlebars", { pageTitle: "Register" });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Error loading /register" });
-  }
-});
-
-webRouter.use("/login", (req, res) => {
-  try {
-    return res.render("login.handlebars", { pageTitle: "Login" });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Error loading /login" });
-  }
-});
-
-webRouter.use("/profile", isAuthenticated, (req, res) => {
-  try {
-    return res.render("profile.handlebars", {
-      pageTitle: "Profile",
-      ...req.session["user"],
-    });
-  } catch (error) {
-    return res.status(500).json({ message: "Error loading /profile" });
-  }
-});
+webRouter.use(sessionsRouter);
+webRouter.use(usersRouter);

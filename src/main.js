@@ -11,19 +11,20 @@ import {
 import { sessions } from "./middlewares/sessions.js";
 import { apiRouter } from "./routes/api/api.router.js";
 import { webRouter } from "./routes/web/web.router.js";
+import { passportInitialize, passportSession } from "./middlewares/authentication.js";
 
 const app = express();
 
 const server = app.listen(8080, async () => {
   const DB_STATUS = await mongoose.connect(MONGODB_URL);
-  if (DB_STATUS)
-    console.log(`Base de datos en linea! Conectado: ${BASE_URL}`);
+  if (DB_STATUS) console.log(`Base de datos en linea! Conectado: ${BASE_URL}`);
 });
 
 app.engine("handlebars", handlebars.engine());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(sessions);
+app.use(passportInitialize, passportSession);
 
 // Socket.io
 const webSocketServer = new Server(server);
@@ -41,4 +42,4 @@ app.use(express.static("static"));
 app.use("/", webRouter);
 app.use("/api", apiRouter);
 
-// 04:10:00
+// 03:10:00 (clase 11)

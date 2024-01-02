@@ -9,6 +9,11 @@ const initialize = async () => {
 
   const fetchProducts = async (url) => {
     const response = await fetch(url);
+
+    if (response.status === 403) {
+      alert("No autorizado!");
+      return (window.location.href = "/login");
+    }
     const products = await response.json();
     return products;
   };
